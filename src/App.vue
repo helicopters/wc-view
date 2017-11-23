@@ -6,6 +6,7 @@
 }
 .container {
 	padding-top: 100px;
+	padding-left: 20px;
 }
 	
 </style>

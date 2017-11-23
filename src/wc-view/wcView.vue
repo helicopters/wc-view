@@ -10,11 +10,10 @@
   display: none;
   will-change: opacity;
   transition: opacity 333ms cubic-bezier(0.4, 0, 0.22, 1);
-  transform: translateZ(0)
 }
 
 .mask-show {
-  display: block
+  display: block;
 }
 
 .mask-diff {
@@ -35,21 +34,34 @@
   align-items: center
 }
 
-
+/* 分页*/
+.pagination {
+	position: absolute;
+	// background: white;
+	// height: 100px;
+	width: 100%;
+	text-align: center;
+	font-weight: bold;
+	font-size: 18px;
+	color:white;
+	margin-top: 10px;
+	letter-spacing: 2px;
+	z-index: 10000;
+}
 </style>
 <template>
-	<!-- <div class="container"> -->
 
-		<!-- 图片浏览器容器 -->
-		<div class="mask">
-			<!-- 注意这里必须用 v-if 不能用 v-show  -->
-			<wc-swiper class="wc-swiper" :autoplay="false" v-if="showSwiper" :defaultSlide="curSlide" @transitionend="transitionend" :pagination="false">
-				<wc-slide v-for="(value, key) in list" class="wc-slide" :key="key">
-					<img :src="value" alt="" width="100%">
-				</wc-slide>
-			</wc-swiper>
-		</div>
-	<!-- </div> -->
+	<!-- 图片浏览器容器 -->
+	<div class="mask">
+		<div class="pagination">{{curSlide + 1}}/{{list.length}}</div>
+		<!-- 注意这里必须用 v-if 不能用 v-show  -->
+		<wc-swiper class="wc-swiper" :autoplay="false" v-if="showSwiper" :defaultSlide="curSlide" @transitionend="transitionend" :pagination="false">
+			<wc-slide v-for="(value, key) in list" class="wc-slide" :key="key">
+				<img :src="value" alt="" width="100%">
+			</wc-slide>
+		</wc-swiper>
+	</div>
+
 </template>
 <script>
 	function toArray(like) {
@@ -111,7 +123,7 @@
 				});
 			},
 
-
+			/* 为 img 绑定 click 事件 */
 			imgClick (e) {
 				/* 获取当前点击的img */
 				this.current = e.target;
@@ -142,6 +154,7 @@
 				this.current.addEventListener('transitionend', transitionend, false);
 			},
 
+			/* 显示黑色的背景层 */
 			showMask () {
 				/* 因为渲染的问题, 所以最好在 onload 结束, 其实就是异步*/
 				this.mask = document.querySelector('.mask');
@@ -180,6 +193,9 @@
 
 				this.current = this.imgs[index];
 				this.curIndex = index;
+
+				/* 设置当前默认的 curslide*/
+				this.curSlide = index;
 
 				this.setProperty(this.current);
 
