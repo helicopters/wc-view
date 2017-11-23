@@ -6,6 +6,10 @@ import 'wc-swiper/style.css'
 Vue.use(wcSwiper);
 
 
+import wcView from './wc-view'
+Vue.use(wcView)
+
+
 new Vue({
     el: '#app',
     template: '<App/>',
