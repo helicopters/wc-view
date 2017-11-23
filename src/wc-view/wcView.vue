@@ -172,6 +172,7 @@
 				}
 				this.current.addEventListener('transitionend', imgHide, false);
 			},
+			/* 滑动图片浏览器的时候 */
 			transitionend (index) {
 				this.recover(this.current, this.curIndex);
 
@@ -206,7 +207,7 @@
 				/* 首先计算出缩放的比例 */
 				/*
 					先确定图片在 img-browser 里面显示的宽度; 
-					如果图片的真实宽度, 小于屏幕的宽度, 则不再方法, 按照真实的宽度进行显示
+					如果图片的真实宽度, 小于屏幕的宽度, 则不再缩放, 按照真实的宽度进行显示
 					如果图片的真实宽度大于屏幕的宽度, 图片的宽度需要是屏幕的宽度; 
 						如果图片宽度为屏幕宽度
 						查看当前的显示的宽度, 然后计算出 x 方向的缩放比例
@@ -218,32 +219,40 @@
 				let yRadio = 0;
 				/* 这个值在后面还要用 */
 				let height = 0;
-				if (this.size[index].naturalWidth > this.docWidth) {
-					xRadio = parseFloat(this.docWidth /this.size[index].displayWidth);
-					let radio = this.docWidth/this.size[index].naturalWidth;
-					height = radio * this.size[index].naturalHeight;
-					yRadio = parseFloat(height / this.size[index].displayHeight);
-				}
 				let xTranslate = 0;
 				let yTranslate = 0;
-				/*
-					先算一下如果元素距离顶部的距离为 0 的时候, 垂直居中, y 需要偏移多少; 
-					再拿到当前元素实际距离顶部的距离
-					如果实际距离, 大于需要的距离. 
-				*/
-				let offset = ( this.docHeight - height ) / 2;
-				let top = img.getBoundingClientRect().top;
-				if (top < offset) {
+
+				if (this.size[index].naturalWidth > this.docWidth) {
+					xRadio = this.docWidth /this.size[index].displayWidth;
+					let radio = this.docWidth/this.size[index].naturalWidth;
+					height = radio * this.size[index].naturalHeight;
+					yRadio = height / this.size[index].displayHeight;
+
+					/*
+						先算一下如果元素距离顶部的距离为 0 的时候, 垂直居中, y 需要偏移多少; 
+						再拿到当前元素实际距离顶部的距离
+						如果实际距离, 大于需要的距离. 
+					*/
+					let offset = ( this.docHeight - height ) / 2;
+					let top = img.getBoundingClientRect().top;
+					/* x 轴位移 */
+					xTranslate = -img.getBoundingClientRect().left;
+					/*
+						这样计算是错误的.
+						if (top < offset) {
+							
+						} else {
+							yTranslate = top - offset;
+						}						
+					*/
 					yTranslate = offset - top;
-				} else {
-					yTranslate = top - offset;
-				}
-				xTranslate = -img.getBoundingClientRect().left;
-				return {
-					xRadio: xRadio,
-					yRadio: yRadio,
-					xTranslate: xTranslate,
-					yTranslate: yTranslate
+
+					return {
+						xRadio: xRadio,
+						yRadio: yRadio,
+						xTranslate: xTranslate,
+						yTranslate: yTranslate
+					}	
 				}
 			},
 
