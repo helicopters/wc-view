@@ -1,8 +1,8 @@
 <style>
 
 .user {
-  height: 100px;
-  width: 160px;	
+  height: 150px;
+  width: 150px;	
 }
 .container {
 	padding-top: 100px;

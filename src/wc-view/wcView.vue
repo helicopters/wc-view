@@ -5,11 +5,13 @@
   right: 0;
   bottom: 0;
   left: 0;
+
   background: black;
   opacity: 0;
   display: none;
   will-change: opacity;
   transition: opacity 333ms cubic-bezier(0.4, 0, 0.22, 1);
+  // transform-origin: left top;
 }
 
 .wc-mask-show {
@@ -41,6 +43,7 @@
 	letter-spacing: 2px;
 	z-index: 10000;
 }
+
 </style>
 <template>
 
@@ -48,7 +51,7 @@
 	<div class="wc-mask">
 		<div class="pagination">{{curSlide + 1}}/{{list.length}}</div>
 		<!-- 注意这里必须用 v-if 不能用 v-show  -->
-		<wc-swiper class="wc-swiper" :autoplay="false" v-if="showSwiper" :defaultSlide="curSlide" @transitionend="transitionend" :pagination="false">
+		<wc-swiper class="wc-swiper" :autoplay="false" v-if="showSwiper" :defaultSlide="curSlide" @transitionend="transitionend" :pagination="false" ref="swiper">
 			<wc-slide v-for="(value, key) in list" class="wc-slide" :key="key">
 				<img :src="value" alt="" width="100%">
 			</wc-slide>
@@ -93,8 +96,10 @@
 		methods: {
 			/* 获取当前屏幕的高度和宽度, 后面计算 scale 需要用到 */
 			getDocSize () {
-				this.docHeight = document.documentElement.clientHeight;
-				this.docWidth  = document.documentElement.clientWidth;
+				// this.docHeight = document.documentElement.clientHeight;
+				// this.docWidth  = document.documentElement.clientWidth;
+				this.docHeight = window.innerHeight;
+				this.docWidth = window.innerWidth;
 			},
 
 
@@ -110,8 +115,6 @@
 						this.property[index] = this.getProperty(img);
 						/* 拿到所有的图片的显示大小, 真实大小*/
 						this.size[index] = this.getSzie(img);
-
-
 						/* 为图片绑定 click 事件 */
 						img.addEventListener('click', this.imgClick, false);
 					}
@@ -130,7 +133,6 @@
 
 			/* 为 img 绑定 click 事件 */
 			imgClick (e) {
-				this.getDocSize();
 				/*
 					计算出当前的元素, 在所有的img 列表里面真正的位置
 				*/
@@ -168,6 +170,7 @@
 				let transitionend = () => {
 					/*显示 swiper */
 					this.showSwiper = true;
+
 					/* 将容器的 zindex 设置成最高*/
 					this.mask.style.zIndex = 2000;
 					/* 还要把当前显示的图片的属性再重置回去*/
@@ -245,7 +248,7 @@
 				this.transform(this.current, this.endStatus[this.curIndex]);
 			},
 			transform (el, {xRadio, yRadio, xTranslate, yTranslate}) {
-				el.style.transform =`translate(${xTranslate}px, ${yTranslate}px) scale(${xRadio}, ${yRadio})`; 
+				el.style.transform =`translate3d(${xTranslate}px, ${yTranslate}px, 0px) scale(${xRadio}, ${yRadio})`; 
 			},
 			getProperty (img) {
 				let m = getComputedStyle(img);
@@ -283,10 +286,10 @@
 				let yTranslate = 0;
 
 				if (this.size[index].naturalWidth > this.docWidth) {
-					xRadio = this.docWidth /this.size[index].displayWidth;
+					xRadio = parseFloat(this.docWidth /this.size[index].displayWidth);
 					let radio = this.docWidth/this.size[index].naturalWidth;
 					height = radio * this.size[index].naturalHeight;
-					yRadio = height / this.size[index].displayHeight;
+					yRadio = parseFloat(height / this.size[index].displayHeight);
 
 					/*
 						先算一下如果元素距离顶部的距离为 0 的时候, 垂直居中, y 需要偏移多少; 
@@ -305,8 +308,9 @@
 							yTranslate = top - offset;
 						}						
 					*/
-					yTranslate = offset - top;
+					yTranslate = parseFloat(offset - top);
 
+					
 					return {
 						xRadio: xRadio,
 						yRadio: yRadio,
