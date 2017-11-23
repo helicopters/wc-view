@@ -118,6 +118,9 @@
 
 			/* 为 img 绑定 click 事件 */
 			imgClick (e) {
+
+
+
 				/* 获取当前点击的img */
 				this.current = e.target;
 				this.curIndex = this.current.index;
@@ -157,7 +160,7 @@
 				}, 50);		
 			},
 
-
+			/* 点击 mask 就隐藏*/
 			maskClick () {
 				this.showSwiper = false;
 				this.mask.style.zIndex = 'auto';
@@ -265,12 +268,19 @@
 			},
 
 			setProperty (img) {
-				img.style.zIndex = 1000;
-				img.style.position = 'relative';
+				if (img) {
+					img.style.zIndex = 1000;
+					img.style.position = 'relative';					
+				}
+
 			},
 			recover (img, index) {
-				img.style.zIndex = this.property[index].zIndex;
-				img.style.position = this.property[index].position;
+				/* 因为有时候有些图片没加载出来, 会报错 */
+				if (img) {
+					img.style.zIndex = this.property[index].zIndex;
+					img.style.position = this.property[index].position;					
+				}
+
 			}
 
 		}
