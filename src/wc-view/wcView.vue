@@ -62,7 +62,7 @@
 	}
 	export default {
 		name: 'App',
-		props: ['list'],
+		// props: ['list'],
 		data () {
 			return {
 				curIndex: -1,
@@ -78,7 +78,10 @@
 				/* 保存图片的真实大小, 显示大小 */
 				size: {},
 				/* 遮罩层 */
-				mask: null
+				mask: null,
+				list: [],
+				reallyIndex: -1,
+				startIndex: -1
 			}
 		},
 		mounted () {
@@ -107,8 +110,7 @@
 						this.property[index] = this.getProperty(img);
 						/* 拿到所有的图片的显示大小, 真实大小*/
 						this.size[index] = this.getSzie(img);
-						/* 计算出所有的图片的终点状态*/
-						this.endStatus[index] = this.calEndStatus(img);
+
 
 						/* 为图片绑定 click 事件 */
 						img.addEventListener('click', this.imgClick, false);
@@ -116,17 +118,43 @@
 				});
 			},
 
+
+			/* 这玩意是给用户调用的, 主要就是做一个 swiper 初始化操作 */
+			open (list, index) {
+				this.list = list;
+				/* 设置默认slide */
+				this.curSlide = index;
+
+				this.startIndex = index;
+			},
+
 			/* 为 img 绑定 click 事件 */
 			imgClick (e) {
+				this.getDocSize();
+				/*
+					计算出当前的元素, 在所有的img 列表里面真正的位置
+				*/
+				this.imgs.forEach((img, index) => {
+					if (e.target == img) {
+						this.reallyIndex = index;
+					}
 
+					/* 
+						计算出所有的图片的终点状态
+						其实也不一定非要计算出所有的图片, 但是我这个, 我嫌麻烦; 
+
+						然后这句一定要在每次点击的时候重新计算一遍, 因为不能保证两次
+						点击之间没有发生滚动, 而滚动是会影响到位移的值的; 
+					*/
+				});
 
 
 				/* 获取当前点击的img */
 				this.current = e.target;
 				this.curIndex = this.current.index;
 
-				/* 设置默认slide */
-				this.curSlide = this.curIndex;
+				/* 获取当前点击元素的终点状态, 这个是为了动画 */
+				this.endStatus[this.curIndex] = this.calEndStatus(this.current);
 
 				this.showMask();
 
@@ -182,15 +210,35 @@
 			},
 			/* 滑动图片浏览器的时候 */
 			transitionend (index) {
+
+				/* 先恢复之前的那个元素*/
 				this.recover(this.current, this.curIndex);
 
 				this.current.style.transform = 'scale(1)';
 
-				this.current = this.imgs[index];
-				this.curIndex = index;
-
-				/* 设置当前默认的 curslide*/
+				/* 设置当前 curSlide, 为的是给 pagination 一个交待*/
 				this.curSlide = index;
+
+				/* 多个列表从这里开始 index 就不一样了, 所以要改, 这里 index 要是在
+				   所有的 img 列表里面的东西才可以; 
+				*/
+				/* 
+					然后找到当前的元素是谁, 应该是谁? 其实算的话能算出来
+					这个 rIndex 才是当前的;
+					
+					比如刚开始点击 a, 然后滚动之后, 又点击了 a
+
+				*/
+
+				let rIndex = this.reallyIndex + (index - this.startIndex);
+
+				this.current = this.imgs[rIndex];
+
+				/* 适配多个列表 */
+				this.curIndex = this.current.index;
+
+				
+				this.endStatus[this.curIndex] = this.calEndStatus(this.current);
 
 				this.setProperty(this.current);
 
@@ -225,6 +273,7 @@
 						图片的真实宽度, 到图片显示的宽度的比例, 再将这个比例和图片的真实高度比较
 						就能拿到图片在 img-browser 中显示的高度. 
 				*/
+
 				let index = img.index;
 				let xRadio = 0;
 				let yRadio = 0;
