@@ -1,5 +1,5 @@
-<style lang="less">
-.mask {
+<style lang="less" scoped>
+.wc-mask {
   position: fixed;
   top: 0;
   right: 0;
@@ -12,17 +12,12 @@
   transition: opacity 333ms cubic-bezier(0.4, 0, 0.22, 1);
 }
 
-.mask-show {
+.wc-mask-show {
   display: block;
 }
 
-.mask-diff {
+.wc-mask-diff {
   opacity: 1;
-}
-
-.wc-preview-img {
-  transform-origin: left top;
-  transition: transform 333ms cubic-bezier(0.4, 0, 0.22, 1);
 }
 
 .wc-swiper {
@@ -31,14 +26,12 @@
 
 .wc-slide {
   display: flex;
-  align-items: center
+  align-items: center;
 }
 
 /* 分页*/
 .pagination {
 	position: absolute;
-	// background: white;
-	// height: 100px;
 	width: 100%;
 	text-align: center;
 	font-weight: bold;
@@ -52,7 +45,7 @@
 <template>
 
 	<!-- 图片浏览器容器 -->
-	<div class="mask">
+	<div class="wc-mask">
 		<div class="pagination">{{curSlide + 1}}/{{list.length}}</div>
 		<!-- 注意这里必须用 v-if 不能用 v-show  -->
 		<wc-swiper class="wc-swiper" :autoplay="false" v-if="showSwiper" :defaultSlide="curSlide" @transitionend="transitionend" :pagination="false">
@@ -75,7 +68,6 @@
 				curIndex: -1,
 				docHeight: '',
 				docWidth: '',
-
 				current: null,
 				curSlide: 0,
 				showSwiper: false,
@@ -85,6 +77,7 @@
 				endStatus: {},
 				/* 保存图片的真实大小, 显示大小 */
 				size: {},
+				/* 遮罩层 */
 				mask: null
 			}
 		},
@@ -129,6 +122,8 @@
 				this.current = e.target;
 				this.curIndex = this.current.index;
 
+				/* 设置默认slide */
+				this.curSlide = this.curIndex;
 
 				this.showMask();
 
@@ -142,9 +137,6 @@
 				let transitionend = () => {
 					/*显示 swiper */
 					this.showSwiper = true;
-
-					/* 设置默认slide */
-					this.curSlide = this.curIndex;
 					/* 将容器的 zindex 设置成最高*/
 					this.mask.style.zIndex = 2000;
 					/* 还要把当前显示的图片的属性再重置回去*/
@@ -157,10 +149,10 @@
 			/* 显示黑色的背景层 */
 			showMask () {
 				/* 因为渲染的问题, 所以最好在 onload 结束, 其实就是异步*/
-				this.mask = document.querySelector('.mask');
-				this.mask.classList.add('mask-show');
+				this.mask = document.querySelector('.wc-mask');
+				this.mask.classList.add('wc-mask-show');
 				setTimeout(()=>{
-					this.mask.classList.add('mask-diff');
+					this.mask.classList.add('wc-mask-diff');
 					this.mask.addEventListener('click', this.maskClick, false);
 				}, 50);		
 			},
@@ -170,9 +162,9 @@
 				this.showSwiper = false;
 				this.mask.style.zIndex = 'auto';
 
-				this.mask.classList.remove('mask-diff');
+				this.mask.classList.remove('wc-mask-diff');
 				let maskHide = ()=> {
-					this.mask.classList.remove('mask-show');
+					this.mask.classList.remove('wc-mask-show');
 					this.mask.removeEventListener('transitionend', maskHide, false);
 				}
 				this.mask.addEventListener('transitionend', maskHide, false);
@@ -279,7 +271,7 @@
 			recover (img, index) {
 				img.style.zIndex = this.property[index].zIndex;
 				img.style.position = this.property[index].position;
-			}, 
+			}
 
 		}
 	}
