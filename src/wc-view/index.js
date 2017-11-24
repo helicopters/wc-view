@@ -5,6 +5,9 @@ import wcSwiper from 'wc-swiper'
 import 'wc-swiper/style.css'
 Vue.use(wcSwiper);
 
+/* 因为我用了 classlist */
+import 'classlist-polyfill'
+
 import './style.css';
 
 let ViewConstructor =  Vue.extend(wcView);

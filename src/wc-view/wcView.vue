@@ -5,7 +5,7 @@
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 10;
+  z-index: 2000;
   background: black;
   opacity: 0;
   will-change: opacity;
@@ -34,7 +34,7 @@
 	color:white;
 	margin-top: 10px;
 	letter-spacing: 2px;
-	z-index: 10;
+	z-index: 2001;
 }
 </style>
 <template>
@@ -42,7 +42,7 @@
 	<div class="wc-mask" v-if="show">
 		<div class="pagination">{{curSlide + 1}}/{{list.length}}</div>
 		<!-- 注意这里必须用 v-if 不能用 v-show  -->
-		<wc-swiper class="wc-swiper" :autoplay="false" v-if="showSwiper" :defaultSlide="curSlide" @transitionend="transitionend" :pagination="false" ref="swiper">
+		<wc-swiper class="wc-swiper" :autoplay="false" v-if="showSwiper" :defaultSlide="curSlide" @transitionend="transitionend" :pagination="false" ref="swiper" box="wc-view-swiper">
 			<wc-slide v-for="(value, key) in list" class="wc-slide" :key="key">
 				<img :src="value" alt="" width="100%">
 			</wc-slide>
@@ -86,6 +86,12 @@
 			},
 			/* 这玩意是给用户调用的, 主要就是做一个 swiper 初始化操作 */
 			open (e, list, index) {
+
+				/* 这段主要是防止上一个还没消失, 这一个又开始点击*/
+				if (document.querySelector('.wc-mask')) {
+					return;
+				}
+
 				this.show = true;
 				this.list = list;
 
@@ -98,6 +104,9 @@
 				let children = parent.children;
 				this.children = children;
 
+				/* 动态添加 transition 样式 */
+				// this.initImg();
+
 				/* 等渲染结束 */
 				setTimeout(()=>{
 					this.showMask();
@@ -107,6 +116,9 @@
 				this.property = this.getProperty(this.current);
 				this.endStatus = this.calEndStatus(this.current);
 				/* 然后放大img*/
+				console.log(this.current);
+				console.log(JSON.stringify(this.endStatus));
+
 				this.transform(this.current, this.endStatus);
 				/* 同时要让 img 的 z-index 比 box 的高 */
 				this.setProperty(this.current);
@@ -120,6 +132,14 @@
 				}
 				this.current.addEventListener('transitionend', transitionend, false);
 			},
+		// 	initImg () {
+		// 		this.children.forEach((img)=>{
+		// 			  transform-origin: left top;
+  // transition: transform 333ms cubic-bezier(0.4, 0, 0.22, 1);
+  // 					img.style.transitionOrigin = 'left top';
+  // 					img.style.transition
+		// 		})
+		// 	},
 			/* 为 img 绑定 click 事件 */
 			/* 显示黑色的背景层 */
 			showMask () {
@@ -136,20 +156,27 @@
 			maskClick () {
 				/* 隐藏 swiper */
 				this.showSwiper = false;
+
 				/* 隐藏 box */
 				this.mask.classList.remove('wc-mask-diff');
 				let maskHide = ()=> {
 					this.mask.classList.remove('wc-mask-show');
-					this.show = false;
+					
 					this.mask.removeEventListener('transitionend', maskHide, false);
 				}
 				this.mask.addEventListener('transitionend', maskHide, false);
 				/* 恢复图片 */
 				this.setProperty(this.current);
 				this.current.style.transform = 'scale(1)';
+
+				/* 在图片恢复之后*/
 				let imgHide = () => {
+					/*恢复图片的样式 */
 					this.recover(this.current, this.property);
+					/* 解绑 transitionend 事件*/
 					this.current.removeEventListener('transitionend', imgHide, false);
+					/* 隐藏掉 mask*/
+					this.show = false;
 				}
 				this.current.addEventListener('transitionend', imgHide, false);
 			},
@@ -170,6 +197,7 @@
 				this.transform(this.current, this.endStatus);
 			},
 			transform (el, {xRadio, yRadio, xTranslate, yTranslate}) {
+				console.log('这里')
 				el.style.transform =`translate3d(${xTranslate}px, ${yTranslate}px, 0px) scale(${xRadio}, ${yRadio})`; 
 			},
 			getProperty (img) {
@@ -197,39 +225,47 @@
 				let height = 0;
 				let xTranslate = 0;
 				let yTranslate = 0;
-				if (img.naturalWidth > this.docWidth) {
-					xRadio = parseFloat(this.docWidth /img.width);
-					let radio = this.docWidth/img.naturalWidth;
-					height = radio * img.naturalHeight;
-					yRadio = parseFloat(height / img.height);
-					/*
-						先算一下如果元素距离顶部的距离为 0 的时候, 垂直居中, y 需要偏移多少; 
-						再拿到当前元素实际距离顶部的距离
-						如果实际距离, 大于需要的距离. 
-					*/
-					let offset = ( this.docHeight - height ) / 2;
-					let top = img.getBoundingClientRect().top;
-					/* x 轴位移 */
-					xTranslate = -img.getBoundingClientRect().left;
-					/*
-						这样计算是错误的.
-						if (top < offset) {
-						} else {
-							yTranslate = top - offset;
-						}						
-					*/
-					yTranslate = parseFloat(offset - top);
-					return {
-						xRadio: xRadio,
-						yRadio: yRadio,
-						xTranslate: xTranslate,
-						yTranslate: yTranslate
-					}	
+
+				console.log(img.naturalWidth,'宽度')
+
+				// if (img.naturalWidth > this.docWidth) {
+				xRadio = parseFloat(this.docWidth /img.width);
+				let radio = this.docWidth/img.naturalWidth;
+				height = radio * img.naturalHeight;
+				yRadio = parseFloat(height / img.height);
+
+
+
+				/*
+					先算一下如果元素距离顶部的距离为 0 的时候, 垂直居中, y 需要偏移多少; 
+					再拿到当前元素实际距离顶部的距离
+					如果实际距离, 大于需要的距离. 
+				*/
+				let offset = ( this.docHeight - height ) / 2;
+				let top = img.getBoundingClientRect().top;
+				/* x 轴位移 */
+				xTranslate = -img.getBoundingClientRect().left;
+				/*
+					这样计算是错误的.
+					if (top < offset) {
+					} else {
+						yTranslate = top - offset;
+					}						
+				*/
+				yTranslate = parseFloat(offset - top);
+				return {
+					xRadio: xRadio,
+					yRadio: yRadio,
+					xTranslate: xTranslate,
+					yTranslate: yTranslate
 				}
+
+
+
 			},
 			setProperty (img) {
 				if (img) {
-					img.style.zIndex = 100;
+					img.style.zIndex = 2002;
 					img.style.position = 'relative';					
 				}
 			},
