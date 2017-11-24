@@ -19,25 +19,25 @@
 		<h1 v-for="i in 10">展位</h1>
 		<!-- 页面显示的图片 -->
 		<div class="box">
-			<img :src="url" v-for="(url,key) in imgList" :key="key" alt="" class="user wc-preview-img" @click="fn(imgList, key)">
+			<img :src="url" v-for="(url,key) in imgList" :key="key" alt="" class="user wc-preview-img" @click="$preview($event, imgList, key)">
 			
 		</div>
 
 
 		<div class="box">
-			<img :src="url" v-for="(url,key) in imgList2" :key="key" alt="" class="user wc-preview-img" @click="fn(imgList2, key)">
+			<img :src="url" v-for="(url,key) in imgList2" :key="key" alt="" class="user wc-preview-img" @click="$preview($event, imgList2, key)">
 			
 		</div>
 	
 		<h1 v-for="i in 10">展位</h1>
 
 		<div class="box">
-			<img :src="url" v-for="(url,key) in imgList3" :key="key" alt="" class="user wc-preview-img" @click="fn(imgList3, key)">
+			<img :src="url" v-for="(url,key) in imgList3" :key="key" alt="" class="user wc-preview-img" @click="$preview($event, imgList3, key)">
 			
 		</div>
 
 
-		<wc-view ref="view"/>
+		<!-- <wc-view ref="view"/> -->
 
 
 		<!-- <wc-view :list="imgList2"/> -->
@@ -66,9 +66,9 @@
 			// console.log(this.$refs.view)
 		},
 		methods: {
-			fn (list, key) {
+			fn (e,list, key) {
 				// console.log(this, this.$event)
-				this.$refs.view.open(list, key);
+				this.$refs.view.open(e,list, key);
 			}
 
 		}

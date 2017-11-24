@@ -1,19 +1,20 @@
 ## wc-view
 移动端图片浏览插件
 
-新的思路, 点击一张图片, 首先让这张图片放大. 我们提供一个方法, 来拿到这个玩意; 
 
-有一个很奇怪很奇怪的bug: 
-在 iOS 下面, safari 浏览器, 底部的 bar 如果出现, 没问题, 如果消失, 点击出现大图的
-时候会抖动, 下面的bar高度是 90px 左右; 
+## 特点
+* 刚开始用的一个浏览插件, 图片变形的问题始终解决不了, 所以自己搞了一个.
+* 写了三天啊啊啊
 
-我觉得是因为没有bar 导致了 transition-origin 出现问题, 可能. 
+## 安装
+npm i wc-view --save
 
-我看 photoswipe 没有这个问题, 可能里面做了一些处理; 
-
+import wcView from 'wc-view'
+Vue.use(wcView);
 
 ## 使用方式
 
-目前的使用方式不是特别方便, 需要这样: 
-1. 引入 wc-view
-2. 
+```html
+<img src="url" v-for="(url, key) in list" @click="$preview($event, list, key)">
+
+```

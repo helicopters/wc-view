@@ -7,8 +7,24 @@ Vue.use(wcSwiper);
 
 import './style.css';
 
+let ViewConstructor =  Vue.extend(wcView);
+
+let instance = null;
+
+let initInstance = ()=>{
+    instance = new ViewConstructor({
+        el: document.createElement('div')
+    });
+    document.body.appendChild(instance.$el);
+}
+
+let preview = (e, list, index)=>{
+	initInstance();	
+	instance.open(e, list, index);
+}
+
 export default {
 	install (Vue) {
-		Vue.component('wcView', wcView);
+		Vue.prototype.$preview = preview;
 	}
 }
