@@ -1,35 +1,52 @@
 ## wc-view
-移动端图片浏览插件
+移动端图片浏览插件. 
 
-
-## 特点
-* 刚开始用的一个浏览插件, 图片变形的问题始终解决不了, 所以自己搞了一个.
-* 写了三天啊啊啊
+## 演示地址
+[演示地址](http://m.youku.com/video/id_XMzE5MDE1NTA3Mg==.html?sharefrom=iphone&sharekey=a0304b40a8da943a028e4b34519067292&from=singlemessage&isappinstalled=0&source=)
 
 ## 安装
-npm i wc-view --save
-
-import wcView from 'wc-view'
-Vue.use(wcView);
-
-## 使用方式
-
-```html
-<img src="url" v-for="(url, key) in list" @click="$preview($event, list, key)">
-
+```shell
+npm i wc-view --save-dev
 ```
 
-图片上面的 class 最好去掉
-z-index 暴漏个接口出来
-样式最好不要加载
-以及 swiper 的什么玩意???
+## 使用
+```shell
+import wcView from 'wc-view';
+import 'wc-view/style.css';
+Vue.use(wcView);
+```
 
-还是有 bug, 当点击 slide 不能让
+```html
+img 标签时: 
+<img class="wc-preview-img" :src="url" v-for="(url, key) in list" :key="key" @click="$preview($event, list, key)">
+
+如果 list 是一个对象数组的时候,
+需要额外为 $preview 传递一个参数, 用于标记对象里哪一个字段是图片 url;
+<img class="wc-preview-img" :src="item.img" v-for="(item, key) in list" :key="key" @click="$preview($event, list, key,'img')">
+
+背景图时:
+<div v-for="(url, key) in list" :key="key" @click="$preview($event, list, key)">
+```
+
+## img 和 背景图之间的区别:
+* img的查看效果, 图片带一个放大效果; 而背景图不带;
+* 为 img 设置大小的时候, 可能会显示变形, 而背景图可以通过 background-size 保持图片
+显示正常;
+* 需要额外的为 img 标签加上一个 wc-perview-img class, 为的是放大效果正常显示;
+
+## 其他
+* 压缩之后在 10k 左右;
+* 默认的图片显示方式是宽度优先, 高度会按比例缩放;(一般情况下图片的宽度会被变成 100% 屏幕宽度)
+* 支持 pagination;
 
 
-因为我设置的是 img width=100% 在图片的宽度小于 100% 的时候可能有问题. 
+## 项目地址
+[wc-view](https://github.com/helicopters/wc-view);
 
-通过 style 设置的属性要记得兼容性处理一下. 
+
+
+
+
 
 
 

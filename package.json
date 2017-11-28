@@ -45,6 +45,7 @@
     "webpack-hot-middleware": "^2.17.1"
   },
   "devDependencies": {
-    "classlist-polyfill": "^1.2.0"
+    "classlist-polyfill": "^1.2.0",
+    "wc-swiper": "^1.3.6"
   }
 }

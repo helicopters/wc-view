@@ -21,9 +21,9 @@ let initInstance = ()=>{
     document.body.appendChild(instance.$el);
 }
 
-let preview = (e, list, index)=>{
+let preview = (e, list, index, key)=>{
 	initInstance();	
-	instance.open(e, list, index);
+	instance.open(e, list, index, key);
 }
 
 export default {

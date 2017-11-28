@@ -4,7 +4,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 // 不需要打包的文件
 const externals = {
-    'vue': 'vue'
+    'vue': 'vue',
+    'wc-swiper': 'wc-swiper'
 }
 
 const packageJson = path.resolve(process.cwd(), 'static') + '/package.json';
