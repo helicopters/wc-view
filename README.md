@@ -28,6 +28,11 @@ img 标签时:
 <div v-for="(url, key) in list" :key="key" @click="$preview($event, list, key)">
 ```
 
+
+## 配置选项
+showCloseBtn: 是否显示关闭按钮, 默认为 true // $preview($event, list, key, '', {showCloseBtn: false})
+
+
 ## img 和 背景图之间的区别:
 * img的查看效果, 图片带一个放大效果; 而背景图不带;
 * 为 img 设置大小的时候, 可能会显示变形, 而背景图可以通过 background-size 保持图片

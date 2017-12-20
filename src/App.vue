@@ -27,7 +27,7 @@
 
 			
 
-		<h1>背景图模式 </h1>
+		<h1 id="test">背景图模式 </h1>
 
 		<div class="xie" v-for="(url, key) in imgList" :key="key"  @click="$preview($event, imgList, key)" :style="{'backgroundImage': 'url(' + url + ')'}">
 			
@@ -42,7 +42,7 @@
 
 		<h2>img 标签 帖子2</h2>
 		<div class="box">
-			<img :src="url" v-for="(url,key) in imgList2" :key="key" alt="" class="user wc-preview-img" @click="$preview($event, imgList2, key)">
+			<img :src="url" v-for="(url,key) in imgList2" :key="key" alt="" class="user wc-preview-img" @click="$preview($event, imgList2, key, '', {showCloseBtn: false})">
 			
 		</div>
 
@@ -66,9 +66,20 @@
 			}
 		},
 		mounted () {
-			// console.log(this.$refs.view)
+		
+
+			// document.querySelector('#test').addEventListener('click', ()=>{
+			// 	// alert(2)
+			// }, false)
+
+			// document.querySelector('#test').addEventListener('dblclick', ()=>{
+			// 	alert(1)
+			// }, false)
+
+
 		},
 		methods: {
+
 			fn (e,list, key) {
 				// console.log(this, this.$event)
 				this.$refs.view.open(e,list, key);

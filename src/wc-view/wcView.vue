@@ -37,13 +37,21 @@
 	letter-spacing: 2px;
 	z-index: 2001;
 }
+.wc-view__close-btn {
+	position: absolute;
+	right: 10px;
+	top: 12px;
+	height: 20px;
+	z-index: 2002;
+}
 </style>
 <template>
 	<!-- 图片浏览器容器 -->
 	<div class="wc-mask" v-if="show" @touchmove.stop.prevent="fx">
 		<div class="pagination">{{curSlide + 1}}/{{list.length}}</div>
+		<img src="./close.svg" alt="" class="wc-view__close-btn" @click="maskClick" v-show="showCloseBtn">
 		<!-- 注意这里必须用 v-if 不能用 v-show  -->
-		<wc-swiper class="wc-swiper" :autoplay="false" :defaultSlide="curSlide" @transitionend="transitionend" :pagination="false" box="wc-view-swiper">
+		<wc-swiper class="wc-swiper" :autoplay="false" :defaultSlide="curSlide" @transitionend="transitionend" :pagination="false">
 			<wc-slide v-for="(value, key) in list" class="wc-slide" :key="key">
 				<img :src="value" alt="" width="100%">
 			</wc-slide>
@@ -53,6 +61,11 @@
 <script>
 	function toArray(like) {
 		return Array.prototype.slice.call(like);
+	}
+	let userAgent  = navigator.userAgent;
+	/* 移动端绑定 click 事件, pc 端绑定 dblclick 双击事件 */
+	function isMobile () {
+		return !!userAgent.match(/AppleWebKit.*Mobile/i) || !!userAgent.match(/MIDP|SymbianOS|NOKIA|SAMSUNG|LG|NEC|TCL|Alcatel|BIRD|DBTEL|Dopod|PHILIPS|HAIER|LENOVO|MOT-|Nokia|SonyEricsson|SIE-|Amoi|ZTE/); //是否为移动终端
 	}
 	export default {
 		name: 'App',
@@ -70,14 +83,15 @@
 				mask: null,
 				list: [],
 				children: [],
-				isNotImg: false
+				isNotImg: false,
+				showCloseBtn: true
 			}
 		},
 		mounted () {
 			this.getDocSize();
 		},
 		methods: {
-			/* 阻止图片浏览器出来之后可以滚动 */
+			/* 阻止图片浏览器出来之后, 页面内容可以滚动 */
 			fx () {},
 			/* 获取当前屏幕的高度和宽度, 后面计算 scale 需要用到 */
 			getDocSize () {
@@ -89,11 +103,12 @@
 				其实这个 index 可以通过 e 计算出来, 现在我不想计算;
 			*/
 			/* 这玩意加参数, 记得把 index.js 里面的函数一起加上*/
-			open (e, list, index, key) {
+			open (e, list, index, key, options) {
 				/* 这段主要是防止上一个还没消失, 这一个又开始点击*/
 				if (document.querySelector('.wc-mask')) {
 					return;
 				}
+
 				/* 初始化一下 curSlide */
 				this.curSlide = index;
 				/* 如果有 key 值, 说明用户传递进来的是一个对象数组, 要取其中的图片字段 */
@@ -104,6 +119,13 @@
 				} else {
 					this.list = list;
 				}
+
+				/* 应用用户配置 */
+				if (options && typeof options.showCloseBtn !== 'undefined') {
+					this.showCloseBtn = options.showCloseBtn;
+				}
+
+
 				/* 渲染 mask */
 				this.show = true;
 				/*
@@ -158,7 +180,12 @@
 				/* 这里的 延迟是为了触发 transition */
 				setTimeout(()=>{
 					this.mask.classList.add('wc-mask-diff');
-					this.mask.addEventListener('click', this.maskClick, false);
+
+					if (isMobile()) {
+						this.mask.addEventListener('click', this.maskClick, false);
+					} else {
+						this.mask.addEventListener('dblclick', this.maskClick, false);
+					}
 				}, 50);		
 			},
 			/* 点击 mask 就隐藏*/
